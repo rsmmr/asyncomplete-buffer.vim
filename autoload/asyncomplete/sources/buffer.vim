@@ -5,10 +5,6 @@ let g:asyncomplete_buffer_word = '\w\+$'
 let g:asyncomplete_buffer_separator = '\W\+'
 
 function! asyncomplete#sources#buffer#completor(opt, ctx)
-    let l:typed = a:ctx['typed']
-
-    call s:refresh_keyword_incremental(l:typed)
-
     if empty(s:words)
         return
     endif
@@ -28,7 +24,7 @@ endfunction
 
 function! asyncomplete#sources#buffer#get_source_options(opts)
     return extend({
-        \ 'events': ['BufWinEnter'],
+        \ 'events': ['BufWinEnter', 'BufRead', 'InsertEnter'],
         \ 'on_event': function('s:on_event'),
         \}, a:opts)
 endfunction
@@ -52,10 +48,7 @@ endfunction
 let s:last_ctx = {}
 function! s:on_event(opt, ctx, event) abort
     if s:should_ignore(a:opt) | return | endif
-
-    if a:event == 'BufWinEnter'
-        call s:refresh_keywords()
-    endif
+    call s:refresh_keywords()
 endfunction
 
 function! s:refresh_keywords() abort
@@ -69,14 +62,4 @@ function! s:refresh_keywords() abort
         endif
     endfor
     call asyncomplete#log('asyncomplete#buffer', 's:refresh_keywords() complete')
-endfunction
-
-function! s:refresh_keyword_incremental(typed) abort
-    let l:words = split(a:typed, g:separator)
-
-    for l:word in l:words
-        if len(l:word) > 1
-            let s:words[l:word] = 1
-        endif
-    endfor
 endfunction
