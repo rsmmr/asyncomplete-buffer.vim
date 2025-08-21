@@ -12,6 +12,7 @@ function! asyncomplete#sources#buffer#completor(opt, ctx)
     let l:matches = []
 
     let l:col = a:ctx['col']
+    let l:typed = a:ctx['typed']
 
     let l:kw = matchstr(l:typed, g:asyncomplete_buffer_word)
     let l:kwlen = len(l:kw)
